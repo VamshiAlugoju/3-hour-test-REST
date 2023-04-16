@@ -10,12 +10,12 @@ window.addEventListener("load", LoadFirst);
 
 function LoadFirst() {
   axios
-    .get("https://crudcrud.com/api/584702e96cda493b914c2adea6f0f34e/products")
+    .get("https://crudcrud.com/api/9923a9c77a3f4184bc6e38f16c6aa4f6/products")
     .then((res) => {
       res.data.forEach((item) => {
-        localStorage.setItem(item._id, JSON.stringify(item));
+        // localStorage.setItem(item._id, JSON.stringify(item));
         Tprice += parseInt(item.price);
-        addToDom(item._id);
+        addToDom(item);
       });
     })
     .catch((err) => {
@@ -32,29 +32,35 @@ function addItem(e) {
 
   axios
     .post(
-      "https://crudcrud.com/api/584702e96cda493b914c2adea6f0f34e/products",
+      "https://crudcrud.com/api/9923a9c77a3f4184bc6e38f16c6aa4f6/products",
       obj
     )
     .then((res) => {
       localStorage.setItem(res.data._id, JSON.stringify(res.data));
       Tprice = Tprice + parseInt(res.data.price);
-      addToDom(res.data._id);
+      addToDom(res.data);
     });
 }
 
-function addToDom(Id) {
-  let obj = JSON.parse(localStorage.getItem(Id));
+function addToDom(obj) {
+  // let obj = JSON.parse(localStorage.getItem(Id));
   let newli = document.createElement("li");
   let newbtn = document.createElement("button");
-
-  newli.innerText = obj.name + "-" + obj.price;
+ 
+  let span = document.createElement("span");
+  newli.textContent = obj.name + " - ";
+  span.textContent =  obj.price+" ";
+  span.id = "Price";
   newli.classList = "list-group-item";
   newli.id = obj._id;
   newbtn.innerText = "Delete Product";
   newbtn.classList = "btn btn-danger btn-sm";
   newbtn.id = "delete_btn";
   newbtn.addEventListener("click", deleteList);
+  
+  newli.appendChild(span)
   newli.appendChild(newbtn);
+  
   ListItems.appendChild(newli);
 
   console.log(Tprice);
@@ -66,12 +72,13 @@ function deleteList(e) {
   let parentLi = e.target.parentElement;
   console.log(parentLi);
   let ObjId = parentLi.getAttribute("id");
-  Tprice -= parseInt(JSON.parse(localStorage.getItem(ObjId)).price);
-  localStorage.removeItem(ObjId);
+  // Tprice -= parseInt(JSON.parse(localStorage.getItem(ObjId)).price);
+  // localStorage.removeItem(ObjId);
+  Tprice -=  parseInt(parentLi.querySelector("#Price").innerText);
   ListItems.removeChild(parentLi);
   axios
     .delete(
-      `https://crudcrud.com/api/584702e96cda493b914c2adea6f0f34e/products/${ObjId}`
+      `https://crudcrud.com/api/9923a9c77a3f4184bc6e38f16c6aa4f6/products/${ObjId}`
     )
     .then((res) => {
       console.log(res);
